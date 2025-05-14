@@ -1,5 +1,7 @@
 package com.ajayaraj.lodgesage.controllers;
 
+import com.ajayaraj.lodgesage.dtos.LodgeDto;
+import com.ajayaraj.lodgesage.mappers.LodgeMapper;
 import com.ajayaraj.lodgesage.models.Lodge;
 import com.ajayaraj.lodgesage.services.LodgeService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,43 +17,49 @@ public class LodgeController {
     @Autowired
     LodgeService lodgeService;
 
+    @Autowired
+    LodgeMapper lodgeMapper;
+
     @GetMapping
-    public ResponseEntity<List<Lodge>> getAllLodges() {
+    public ResponseEntity<List<LodgeDto>> getAllLodges() {
         List<Lodge> lodges = lodgeService.getAllLodges();
-        return ResponseEntity.ok(lodges);
+        List<LodgeDto> lodgeDtos = lodgeMapper.toDtoList(lodges);
+        return ResponseEntity.ok(lodgeDtos);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Lodge> getLodgeById(@PathVariable Long id) {
+    public ResponseEntity<LodgeDto> getLodgeById(@PathVariable Long id) {
         Lodge lodge = lodgeService.getLodgeById(id);
         if (lodge != null) {
-            return ResponseEntity.ok(lodge);
+            return ResponseEntity.ok(lodgeMapper.toDto(lodge));
         } else {
             return ResponseEntity.notFound().build();
         }
     }
 
     @PostMapping
-    public ResponseEntity<Lodge> addLodge(@RequestBody Lodge lodge) {
+    public ResponseEntity<LodgeDto> addLodge(@RequestBody LodgeDto lodgeDto) {
+        Lodge lodge = lodgeMapper.toEntity(lodgeDto);
         Lodge createdLodge = lodgeService.addLodge(lodge);
-        return ResponseEntity.status(201).body(createdLodge);
+        return ResponseEntity.status(201).body(lodgeMapper.toDto(createdLodge));
     }
 
     @PutMapping
-    public ResponseEntity<Lodge> updateLodge(@RequestBody Lodge lodge) {
+    public ResponseEntity<LodgeDto> updateLodge(@RequestBody LodgeDto lodgeDto) {
+        Lodge lodge = lodgeMapper.toEntity(lodgeDto);
         Lodge updatedLodge = lodgeService.updateLodge(lodge);
         if (updatedLodge != null) {
-            return ResponseEntity.ok(updatedLodge);
+            return ResponseEntity.ok(lodgeMapper.toDto(updatedLodge));
         } else {
             return ResponseEntity.notFound().build();
         }
     }
 
     @DeleteMapping("{id}")
-    public ResponseEntity<Lodge> deleteLodge(@PathVariable Long id) {
+    public ResponseEntity<LodgeDto> deleteLodge(@PathVariable Long id) {
         Lodge deletedLodge = lodgeService.deleteLodge(id);
         if (deletedLodge != null) {
-            return ResponseEntity.ok(deletedLodge);
+            return ResponseEntity.ok(lodgeMapper.toDto(deletedLodge));
         } else {
             return ResponseEntity.notFound().build();
         }
