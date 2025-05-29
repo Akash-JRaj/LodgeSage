@@ -1,5 +1,7 @@
 package com.ajayaraj.lodgesage.controllers;
 
+import com.ajayaraj.lodgesage.dtos.UserDto;
+import com.ajayaraj.lodgesage.mappers.UserMapper;
 import com.ajayaraj.lodgesage.models.User;
 import com.ajayaraj.lodgesage.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,16 +17,19 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
 
     private UserService userService;
+    private UserMapper userMapper;
 
     @Autowired
-    public AuthController(UserService userService) {
+    public AuthController(UserService userService, UserMapper userMapper) {
         this.userService = userService;
+        this.userMapper = userMapper;
     }
 
     @PostMapping("/register")
-    public ResponseEntity<User> registerUser(@RequestBody User user) {
+    public ResponseEntity<UserDto> registerUser(@RequestBody UserDto userDto) {
+        User user = userMapper.toEntity(userDto);
         User registeredUser = userService.register(user);
-        return ResponseEntity.ok(registeredUser);
+        return ResponseEntity.ok(userMapper.toDto(registeredUser));
     }
 
     @PostMapping("/login")
